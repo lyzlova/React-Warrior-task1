@@ -12,33 +12,7 @@ export default class App extends React.Component {
     this.state = {
       disabled: 'disabled',
       stap: 0,
-      nameStap: '',
-      steps: [
-        {
-          id: 0,
-          name: 'Basic',
-          isActive: true,
-          isCompleted: false,
-        },
-        {
-          id: 1,
-          name: 'Contacts',
-          isActive: false,
-          isCompleted: false,
-        },
-        {
-          id: 2,
-          name: 'Avatar',
-          isActive: false,
-          isCompleted: false,
-        },
-        {
-          id: 3,
-          name: 'Finish',
-          isActive: false,
-          isCompleted: false,
-        },
-      ],
+      countryNumber: '1',
       values: {
         firstname: '',
         lastname: '',
@@ -47,7 +21,7 @@ export default class App extends React.Component {
         gender: 'male',
         email: '',
         mobile: '',
-        country: '',
+        country: 'Ukraine',
         city: '',
         avatar: '',
       },
@@ -70,7 +44,6 @@ export default class App extends React.Component {
     const { values } = state;
     const errors = {};
 
-    console.log(stap);
     if (stap === 0) {
       if (!values.firstname) {
         errors.firstname = 'Required';
@@ -133,60 +106,38 @@ export default class App extends React.Component {
       ...prevState,
       values: newValues,
     }));
+
+    if (event.target.name === 'country') {
+      this.setState({
+        ...this.state,
+        countryNumber: event.target.value,
+        values: {
+          ...this.state.values,
+          country: event.target.options[event.target.selectedIndex].text,
+        },
+      });
+    }
   };
 
   incrementStap = e => {
     const errors = this.validate(this.state, this.state.stap);
 
-    console.log(this.state.values);
-
     if (Object.keys(errors).length === 0) {
       if (e.target.className === 'btn btn-secondary') {
-        this.setState((prevState, prevProps) => ({
+        this.setState(prevState => ({
           stap: prevState.stap + 1,
           disabled: 'enable',
         }));
-
-        const newSteps = [...this.state.steps];
-
-        if (this.state.stap === newSteps[this.state.stap].id) {
-          console.log(this.state.stap);
-          const newActiveSteps = this.state.stap + 1;
-          newSteps[this.state.stap].isActive = false;
-          newSteps[newActiveSteps].isActive = true;
-          newSteps[this.state.stap].isCompleted = true;
-          this.setState({
-            steps: newSteps,
-          });
-        } else {
-          newSteps[this.state.stap].isActive = '';
-          newSteps[this.state.stap].isCompleted = '';
-          this.setState({
-            steps: newSteps,
-          });
-        }
       } else {
-        this.setState((prevState, prevProps) => ({
+        this.setState(prevState => ({
           stap: prevState.stap - 1,
         }));
-
 
         if (this.state.stap === 1) {
           this.setState({
             disabled: 'disabled',
           });
         }
-
-
-        const newSteps = [...this.state.steps];
-
-        const newActiveSteps = this.state.stap - 1;
-        newSteps[this.state.stap].isActive = false;
-        newSteps[newActiveSteps].isActive = true;
-        newSteps[this.state.stap].isCompleted = false;
-        this.setState({
-          steps: newSteps,
-        });
       }
     } else {
       this.setState({
@@ -196,13 +147,23 @@ export default class App extends React.Component {
   };
 
   getClass = index => {
-    if (this.state.steps.isActive === true) {
+    if (
+      (index === 0 && this.state.stap === 0) ||
+      (index === 1 && this.state.stap === 1) ||
+      (index === 2 && this.state.stap === 2) ||
+      (index === 3 && this.state.stap === 3)
+    ) {
       return 'is-active';
     }
-    if (this.state.steps[index].isActive === true) {
-      return 'is-active';
-    }
-    if (this.state.steps[index].isCompleted === true) {
+    if (
+      (index === 0 && this.state.stap === 1) ||
+      (index === 1 && this.state.stap === 2) ||
+      (index === 2 && this.state.stap === 3) ||
+      (index === 0 && this.state.stap === 2) ||
+      (index === 0 && this.state.stap === 3) ||
+      (index === 1 && this.state.stap === 2) ||
+      (index === 1 && this.state.stap === 3)
+    ) {
       return 'is-completed';
     }
   };
@@ -223,14 +184,16 @@ export default class App extends React.Component {
   };
 
   render() {
+    const nameStep = ['Basic', 'Contacts', 'Avatar', 'Finish'];
+
     return (
       <div className="form-container card">
         <form className="form card-body">
           <div className="steps mb-4">
-            {this.state.steps.map((step, index) => (
-              <div key={step.id} className={`step ${this.getClass(index)}`}>
+            {nameStep.map((step, index) => (
+              <div key={index} className={`step ${this.getClass(index)}`}>
                 <div className="step__marker">{index + 1}</div>
-                <div className="step__title mt-1">{step.name}</div>
+                <div className="step__title mt-1">{step}</div>
               </div>
             ))}
           </div>
@@ -238,12 +201,15 @@ export default class App extends React.Component {
           {this.state.stap === 0 && (
             <Basic value={this.state} onChange={this.onChange} />
           )}
+
           {this.state.stap === 1 && (
             <Contacts value={this.state} onChange={this.onChange} />
           )}
+
           {this.state.stap === 2 && (
             <Avatar value={this.state} onChangeAvatar={this.onChangeAvatar} />
           )}
+
           {this.state.stap === 3 && (
             <Finish value={this.state} onChange={this.onChange} />
           )}

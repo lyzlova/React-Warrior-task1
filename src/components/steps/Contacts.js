@@ -13,6 +13,16 @@ export default class Contacts extends React.Component {
     });
   };
 
+  getCities = citiesList => {
+    return citiesList.map(city => {
+      return (
+        <option key={city.id} value={city.name}>
+          {city.name}
+        </option>
+      );
+    });
+  };
+
   getCitiesItems = country => {
     const citiesList = [];
     for (let key in cities) {
@@ -28,7 +38,7 @@ export default class Contacts extends React.Component {
 
   render() {
     const { value, onChange } = this.props;
-    const citiesList = this.getCitiesItems(value.values.country);
+    const citiesList = this.getCitiesItems(value.countryNumber);
     return (
       <React.Fragment>
         <div className="form-group">
@@ -68,7 +78,7 @@ export default class Contacts extends React.Component {
             className="form-control"
             id="country"
             name="country"
-            value={value.values.country}
+            value={value.values.countryNumber}
             onChange={onChange}>
             {this.getCountry(countries)}
           </select>
@@ -82,18 +92,7 @@ export default class Contacts extends React.Component {
             value={value.values.city}
             onChange={onChange}>
             <option value="">Select city</option>
-            {value.values.country === 1 &&
-              citiesList.map(city => (
-                <option key={city.id} value={city.id}>
-                  {city.name}
-                </option>
-              ))}
-            {value.values.country !== 1 &&
-              citiesList.map(city => (
-                <option key={city.id} value={city.id}>
-                  {city.name}
-                </option>
-              ))}
+            {this.getCities(citiesList)}
           </select>
         </div>
       </React.Fragment>
